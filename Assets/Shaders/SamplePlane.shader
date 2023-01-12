@@ -19,9 +19,8 @@ Shader "HorizontalPlaneReflection/SamplePlane"
 
         Pass
         {
-            Name "ForwardLit"
-            Tags
-            { }
+            Name "ForwardUnlit"
+            Tags { }
             ZWrite On
 
             HLSLPROGRAM
@@ -66,15 +65,12 @@ Shader "HorizontalPlaneReflection/SamplePlane"
 
             half4 frag (Varyings input) : SV_Target
             {
-                // sample the texture
                 half4 outColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv);
                 outColor *= _BaseColor;
-                half4 reflectionColor = SAMPLE_TEXTURE2D(_HorizontalPlaneReflectionTexture, sampler_HorizontalPlaneReflectionTexture, input.positionSS.xy/input.positionSS.w);
+                half4 reflectionColor = SAMPLE_TEXTURE2D(_HorizontalPlaneReflectionTexture, sampler_HorizontalPlaneReflectionTexture, input.positionSS.xy / input.positionSS.w);
 
-                outColor.rgb = outColor.rgb * (1.0 - reflectionColor.a* _ReflectionTextureIntensity) + reflectionColor.rgb * _ReflectionTextureIntensity;
-
-                // outColor.rgb = reflectionColor.rgb;
-                // outColor.a = 1.0;
+                outColor.rgb = reflectionColor.rgb * _ReflectionTextureIntensity
+                    + outColor.rgb * (1.0 - reflectionColor.a* _ReflectionTextureIntensity);
                 
                 return outColor;
             }

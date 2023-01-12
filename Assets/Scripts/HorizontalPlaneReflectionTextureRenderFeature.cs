@@ -204,9 +204,6 @@ public class HorizontalPlaneReflectionTextureRenderFeature : ScriptableRendererF
         /// <summary> レンダリング対象の Depth Pass の ShaderTagID </summary>
         private readonly ShaderTagId _depthShaderTagId = new ShaderTagId("DepthOnly");
 
-        /// <summary> RenderStateBlock </summary>
-        private RenderStateBlock _stateBlock;
-
         /// <inheritdoc cref="ScriptableRenderPass.Execute"/>
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
@@ -235,11 +232,10 @@ public class HorizontalPlaneReflectionTextureRenderFeature : ScriptableRendererF
             context.ExecuteCommandBuffer(cmd);
             cmd.Clear();
 
-            // Draw
-            // 先に Depth だけ描く
+            // Draw Depth
             context.DrawRenderers(cullingResults, ref depthDrawingSettings, ref FilteringSettings);
-            // ZTest : Equal & AlphaBlend で書く
-            context.DrawRenderers(cullingResults, ref drawingSettings, ref FilteringSettings, ref _stateBlock);
+            // Draw Color
+            context.DrawRenderers(cullingResults, ref drawingSettings, ref FilteringSettings);
 
             // 反転を元に戻す
             ResetReflect(cmd, context, defaultViewMatrix, projectionMatrix);
@@ -258,26 +254,6 @@ public class HorizontalPlaneReflectionTextureRenderFeature : ScriptableRendererF
 
             // Set FilteringSettings
             FilteringSettings = new FilteringSettings(RenderQueueRange.opaque, settings.cullingMask);
-
-            // Set RenderStateBlock
-            var depthState = DepthState.defaultValue;
-            depthState.writeEnabled = false;
-            depthState.compareFunction = CompareFunction.Equal;
-
-            var blendState = new BlendState();
-            var renderTargetBlendState = RenderTargetBlendState.defaultValue;
-            renderTargetBlendState.sourceColorBlendMode = BlendMode.SrcAlpha;
-            renderTargetBlendState.destinationColorBlendMode = BlendMode.OneMinusSrcAlpha;
-            renderTargetBlendState.sourceAlphaBlendMode = BlendMode.SrcAlpha;
-            renderTargetBlendState.destinationAlphaBlendMode = BlendMode.OneMinusSrcAlpha;
-            blendState.separateMRTBlendStates = false;
-            blendState.blendState0 = renderTargetBlendState;
-
-            _stateBlock = new RenderStateBlock(RenderStateMask.Blend | RenderStateMask.Depth)
-            {
-                blendState = blendState,
-                depthState = depthState
-            };
         }
     }
 

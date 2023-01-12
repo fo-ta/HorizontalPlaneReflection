@@ -153,14 +153,13 @@ Shader "HorizontalPlaneReflection/Opaque/SampleLit"
 
         Pass
         {
-            // Lightmode matches the ShaderPassName set in UniversalRenderPipeline.cs. SRPDefaultUnlit and passes with
-            // no LightMode tag are also rendered by Universal Render Pipeline
-            Name "ForwardLit"
+            Name "HorizontalPlaneReflectionOpaque"
             Tags{"LightMode" = "HorizontalPlaneReflectionOpaque"}
 
-            Blend[_SrcBlend][_DstBlend]
-            ZWrite[_ZWrite]
-            Cull[_Cull]
+            Blend SrcAlpha OneMinusSrcAlpha
+            Cull [_Cull]
+            ZTest Equal
+            ZWrite Off
 
             HLSLPROGRAM
             // #pragma exclude_renderers gles gles3 glcore
@@ -216,7 +215,7 @@ Shader "HorizontalPlaneReflection/Opaque/SampleLit"
             // #pragma multi_compile _ _REFLECTION_TEST
 
             #pragma vertex LitPassVertex
-            #pragma fragment CustomLitPassFragment
+            #pragma fragment ReflectionLitPassFragment
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/LitForwardPass.hlsl"
@@ -224,7 +223,7 @@ Shader "HorizontalPlaneReflection/Opaque/SampleLit"
             // 反射用 HLSL
             #include "ReflectionCommon.hlsl"
 
-            half4 CustomLitPassFragment(Varyings input) : SV_Target
+            half4 ReflectionLitPassFragment(Varyings input) : SV_Target
             {
                 half4 outColor = LitPassFragment(input);
 

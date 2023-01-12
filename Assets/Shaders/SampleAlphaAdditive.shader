@@ -87,7 +87,7 @@ Shader "HorizontalPlaneReflection/Transparent/SampleAlphaAdditive"
 
         Pass
         {
-            Name "ForwardLit"
+            Name "ForwardUnlit"
             Tags { }
             Blend One OneMinusSrcAlpha
             Cull [_CullMode]
@@ -102,6 +102,7 @@ Shader "HorizontalPlaneReflection/Transparent/SampleAlphaAdditive"
 
         Pass
         {
+            Name "HorizontalPlaneReflectionTransparent"
             Tags { "LightMode"="HorizontalPlaneReflectionTransparent" }
             Blend One OneMinusSrcAlpha
             Cull [_CullMode]
